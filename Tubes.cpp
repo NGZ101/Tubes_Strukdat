@@ -123,7 +123,7 @@ void beliGame(string nama, string orang, int bayar) {
                 cout << endl;
                 cout << "Purwokerto, " << var_waktu << endl;
                 cout << "==============================================================" << endl;
-                cout << "      Terima Kasih Telah Membeli Game Di TOKO GAME 2475!      " << endl;
+                cout << "      Terima Kasih Telah Membeli Game Di GAME CENTER IN!      " << endl;
                 cout << "==============================================================" << endl;
                 delete current;
                 return;
@@ -174,7 +174,7 @@ int main() {
     initializeTable();
 
     cout << "==============================================================" << endl;
-    cout << "=                      TOKO GAME 2475                        =" << endl;
+    cout << "=                      GAME CENTER IN                        =" << endl;
     cout << "==============================================================" << endl;
     while (true) {
         cout << "=============================" << endl;
