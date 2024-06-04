@@ -1,15 +1,13 @@
-// Irfan Thoriq Habibi - 2311102131
-// Naufal Geraldo Putra Pramudianartono - 2311102154
-
 #include <iostream>
 #include <iomanip>
 #include <ctime>
+#include <algorithm>
 
 using namespace std;
 
 const int MAX_SIZE = 10;
 int harga_game[MAX_SIZE] = {275000, 270000, 150000, 90000, 67000, 79000, 100000, 50000, 120000, 200000};
-string nama_game[MAX_SIZE] = {"Gta V", "Resident Evil 4", "PUBG", "VALORANT", "Genshin Impact", "Honkai Star Rail", "Wuthering waves", "Mobile legends", "Blue Arcive", "Arknight"};
+string nama_game[MAX_SIZE] = {"Gta V", "Resident Evil 4", "PUBG", "VALORANT", "Genshin Impact", "Honkai Star Rail", "Wuthering Waves", "Mobile Legends", "Blue Archive", "Arknight"};
 time_t var_detik = time(0);
 string var_waktu = ctime(&var_detik);
 
@@ -76,11 +74,17 @@ void addGame(string nama, int harga) {
 
 // Fungsi untuk menghapus data game berdasarkan nama
 void removeGame(string nama) {
+    string nama_lower = nama;
+    transform(nama_lower.begin(), nama_lower.end(), nama_lower.begin(), ::tolower);
+
     for (int i = 0; i < MAX_SIZE; ++i) {
         Game* current = table[i];
         Game* prev = nullptr;
         while (current != nullptr) {
-            if (current->nama == nama) {
+            string current_nama_lower = current->nama;
+            transform(current_nama_lower.begin(), current_nama_lower.end(), current_nama_lower.begin(), ::tolower);
+
+            if (current_nama_lower == nama_lower) {
                 if (prev == nullptr) {
                     table[i] = current->next;
                 } else {
@@ -99,11 +103,17 @@ void removeGame(string nama) {
 
 // Fungsi untuk membeli game berdasarkan nama dan mencetak struk pembayaran
 void beliGame(string nama, string orang, int bayar) {
+    string nama_lower = nama;
+    transform(nama_lower.begin(), nama_lower.end(), nama_lower.begin(), ::tolower);
+
     for (int i = 0; i < MAX_SIZE; ++i) {
         Game* current = table[i];
         Game* prev = nullptr;
         while (current != nullptr) {
-            if (current->nama == nama) {
+            string current_nama_lower = current->nama;
+            transform(current_nama_lower.begin(), current_nama_lower.end(), current_nama_lower.begin(), ::tolower);
+
+            if (current_nama_lower == nama_lower) {
                 if (prev == nullptr) {
                     table[i] = current->next;
                 } else {
@@ -137,10 +147,16 @@ void beliGame(string nama, string orang, int bayar) {
 
 // Fungsi untuk mencari game berdasarkan nama
 void cariGame(string nama) {
+    string nama_lower = nama;
+    transform(nama_lower.begin(), nama_lower.end(), nama_lower.begin(), ::tolower);
+
     for (int i = 0; i < MAX_SIZE; ++i) {
         Game* current = table[i];
         while (current != nullptr) {
-            if (current->nama == nama) {
+            string current_nama_lower = current->nama;
+            transform(current_nama_lower.begin(), current_nama_lower.end(), current_nama_lower.begin(), ::tolower);
+
+            if (current_nama_lower == nama_lower) {
                 cout << "Game ditemukan!" << endl;
                 cout << "Nama Game : " << current->nama << endl;
                 cout << "Harga     : Rp." << current->harga << endl;
@@ -252,7 +268,7 @@ int main() {
                 return 0;
             default:
                 cout << "==============================================================" << endl;
-                cout << "=    Input tidak valid. Mohon masukkan angka 1 hingga 6.      =" << endl;
+                cout << "=    Input tidak valid. Mohon masukkan angka 1 hingga 6.     =" << endl;
                 cout << "==============================================================" << endl;
         }
     }
