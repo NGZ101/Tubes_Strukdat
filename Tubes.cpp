@@ -1,196 +1,150 @@
+// Irfan Thoriq Habibi - 2311102131
+// Naufal Geraldo Putra Pramudianartono - 2311102154
+
 #include <iostream>
 #include <iomanip>
 #include <ctime>
-#include <algorithm>
 
 using namespace std;
-
+//Jumlah array
 const int MAX_SIZE = 10;
+//data array yang tersimpan didalam program
 int harga_game[MAX_SIZE] = {275000, 270000, 150000, 90000, 67000, 79000, 100000, 50000, 120000, 200000};
 string nama_game[MAX_SIZE] = {"Gta V", "Resident Evil 4", "PUBG", "VALORANT", "Genshin Impact", "Honkai Star Rail", "Wuthering Waves", "Mobile Legends", "Blue Archive", "Arknight"};
+//berfungsi untuk menampilkan waktu secara real time
 time_t var_detik = time(0);
 string var_waktu = ctime(&var_detik);
 
-// Fungsi hash sederhana untuk menghasilkan indeks dari kunci (harga)
-int hash_func(int key) {
-    return key % MAX_SIZE;
-}
-
 // Struktur data untuk menyimpan informasi game
-struct Game {
-    string nama;
-    int harga;
+struct Game {//tipe data kompleks yang berfungsi untuk menyimpan data game
+    string nama;//tipe data primitif untuk menyimpan nama
+    int harga;//tipe data primitif untuk menyimpan harga
     Game* next;
     Game(string nama, int harga) : nama(nama), harga(harga), next(nullptr) {}
 };
 
-// Pointer array untuk tabel hash
-Game* table[MAX_SIZE];
+// Pointer untuk linked list
+Game* head = nullptr;
 
-// Fungsi untuk inisialisasi tabel hash
-void initializeTable() {
-    for (int i = 0; i < MAX_SIZE; ++i) {
-        table[i] = nullptr;
-    }
-
-    // Tambahkan data game yang sudah tersedia tanpa mencetak pesan
-    for (int i = 0; i < MAX_SIZE; ++i) {
-        Game* game = new Game(nama_game[i], harga_game[i]);
-        int index = hash_func(harga_game[i]);
-        game->next = table[index];
-        table[index] = game;
+// Fungsi untuk inisialisasi linked list
+void initializeList() {
+    for (int i = 0; i < MAX_SIZE; ++i) {//looping pada array
+        Game* game = new Game(nama_game[i], harga_game[i]);//mencetak node baru
+        game->next = head;//mengatur pointer next menuju head
+        head = game;//memperbarui head
     }
 }
 
 // Fungsi untuk membebaskan memori yang dialokasikan
-void clearTable() {
-    for (int i = 0; i < MAX_SIZE; ++i) {
-        Game* current = table[i];
-        while (current != nullptr) {
-            Game* temp = current;
-            current = current->next;
-            delete temp;
-        }
-        table[i] = nullptr;
+void clearList() {
+    Game* current = head;//pointer current diinisialisasi ke head
+    while (current != nullptr) {//looping node
+        Game* temp = current;
+        current = current->next;
+        delete temp;//hapus node yang diminta
     }
+    head = nullptr;//mengatur head agar dapat kembali ke nullptr
 }
 
-// Fungsi untuk menambahkan data game ke hashtable
-void addGame(string nama, int harga) {
-    int index = hash_func(harga);
-    Game* current = table[index];
-    while (current != nullptr) {
+// Fungsi untuk menambahkan data game ke linked list
+void JualGame(string nama, int harga) {
+    Game* current = head;//pointer current diinisialisasi ke node pertama (head)
+    while (current != nullptr) {//memeriksa duplikasi
         if (current->harga == harga && current->nama == nama) {
             cout << "Game dengan nama " << nama << " dan harga " << harga << " sudah ada." << endl;
             return;
         }
-        current = current->next;
+        current = current->next;//pindah ke node berikutnya
     }
-    Game* game = new Game(nama, harga);
-    game->next = table[index];
-    table[index] = game;
+    Game* game = new Game(nama, harga);//menambahkan game baru
+    game->next = head;
+    head = game;
     cout << "Game " << nama << " dengan harga Rp." << harga << " berhasil ditambahkan." << endl;
+}
+// Fungsi untuk membeli game berdasarkan nama dan mencetak struk pembayaran
+void BeliGame(string nama, string orang, int bayar) {
+    Game* current = head;//inisialisasi pointer current menuju head
+    while (current != nullptr) {//pencarian game
+        if (current->nama == nama) {//struk pembelian
+            cout << "==============================================================" << endl;
+            cout << "=                       STRUK PEMBELIAN                      =" << endl;
+            cout << "==============================================================" << endl;
+            cout << "Nama Pembeli: ";
+            cin.ignore();
+            getline(cin, orang);
+            cout << "Nama Game : " << current->nama << endl;
+            cout << "Harga     : Rp." << current->harga << endl;
+            cout << "Uang      : Rp."; cin >> bayar;
+            int kembalian = bayar - current->harga;
+            cout << "Kembalian : Rp." << bayar << " - " << "Rp." << current->harga << " = Rp." << kembalian << endl;
+            cout << endl;
+            cout << "Purwokerto, " << var_waktu << endl;
+            cout << "==============================================================" << endl;
+            cout << "=     Terima Kasih Telah Membeli Game Di GAME CENTER IN!     =" << endl;
+            cout << "==============================================================" << endl;
+            return;
+        }
+        current = current->next;//pindah ke node berikutnya
+    }
+    //pesan yang akan muncul jika game yang ingin dibeli tidak tersedia
+    cout << "Game dengan nama " << nama << " tidak tersedia!" << endl;
 }
 
 // Fungsi untuk menghapus data game berdasarkan nama
-void removeGame(string nama) {
-    string nama_lower = nama;
-    transform(nama_lower.begin(), nama_lower.end(), nama_lower.begin(), ::tolower);
-
-    for (int i = 0; i < MAX_SIZE; ++i) {
-        Game* current = table[i];
-        Game* prev = nullptr;
-        while (current != nullptr) {
-            string current_nama_lower = current->nama;
-            transform(current_nama_lower.begin(), current_nama_lower.end(), current_nama_lower.begin(), ::tolower);
-
-            if (current_nama_lower == nama_lower) {
-                if (prev == nullptr) {
-                    table[i] = current->next;
-                } else {
-                    prev->next = current->next;
-                }
-                delete current;
-                cout << "Game dengan nama " << nama << " telah dihapus!" << endl;
-                return;
+void HapusGame(string nama) {
+    Game* current = head;//inisialisasi pointer current menuju head
+    Game* prev = nullptr;//inisialisasi pointer prev menuju nullptr (simpan node sebelumnya)
+    while (current != nullptr) {//memastikan kondisi current tetapi looping selama tidak menuju nullptr
+        if (current->nama == nama) {//memeriksa nama game
+            if (prev == nullptr) {//menghapus node/game
+                head = current->next;
+            } else {
+                prev->next = current->next;
             }
-            prev = current;
-            current = current->next;
+            delete current;
+            cout << "Game dengan nama " << nama << " telah dihapus!" << endl;
+            return;
         }
-    }
+        prev = current;//pindah ke node selanjutnya
+        current = current->next;
+    }//pesan yang akan muncul jika game yang ingin dihapus tidak tersedia
     cout << "Game dengan nama " << nama << " tidak tersedia!" << endl;
 }
-
-// Fungsi untuk membeli game berdasarkan nama dan mencetak struk pembayaran
-void beliGame(string nama, string orang, int bayar) {
-    string nama_lower = nama;
-    transform(nama_lower.begin(), nama_lower.end(), nama_lower.begin(), ::tolower);
-
-    for (int i = 0; i < MAX_SIZE; ++i) {
-        Game* current = table[i];
-        Game* prev = nullptr;
-        while (current != nullptr) {
-            string current_nama_lower = current->nama;
-            transform(current_nama_lower.begin(), current_nama_lower.end(), current_nama_lower.begin(), ::tolower);
-
-            if (current_nama_lower == nama_lower) {
-                if (prev == nullptr) {
-                    table[i] = current->next;
-                } else {
-                    prev->next = current->next;
-                }
-                cout << "==============================================================" << endl;
-                cout << "=                       STRUK PEMBELIAN                      =" << endl;
-                cout << "==============================================================" << endl;
-                cout << "Nama Pembeli: ";
-                cin.ignore();
-                getline(cin, orang);
-                cout << "Nama Game : " << current->nama << endl;
-                cout << "Harga     : Rp." << current->harga << endl;
-                cout << "Uang      : Rp."; cin >> bayar;
-                int kembalian = bayar - current->harga;
-                cout << "Kembalian : Rp." << bayar << " - " << "Rp." << current->harga << " = Rp." << kembalian << endl;
-                cout << endl;
-                cout << "Purwokerto, " << var_waktu << endl;
-                cout << "==============================================================" << endl;
-                cout << "      Terima Kasih Telah Membeli Game Di GAME CENTER IN!      " << endl;
-                cout << "==============================================================" << endl;
-                delete current;
-                return;
-            }
-            prev = current;
-            current = current->next;
-        }
-    }
-    cout << "Game dengan nama " << nama << " tidak tersedia!" << endl;
-}
-
 // Fungsi untuk mencari game berdasarkan nama
-void cariGame(string nama) {
-    string nama_lower = nama;
-    transform(nama_lower.begin(), nama_lower.end(), nama_lower.begin(), ::tolower);
-
-    for (int i = 0; i < MAX_SIZE; ++i) {
-        Game* current = table[i];
-        while (current != nullptr) {
-            string current_nama_lower = current->nama;
-            transform(current_nama_lower.begin(), current_nama_lower.end(), current_nama_lower.begin(), ::tolower);
-
-            if (current_nama_lower == nama_lower) {
-                cout << "Game ditemukan!" << endl;
-                cout << "Nama Game : " << current->nama << endl;
-                cout << "Harga     : Rp." << current->harga << endl;
-                return;
-            }
-            current = current->next;
+void CariGame(string nama) {
+    Game* current = head;//pointer current diinisialisasi menuju head
+    while (current != nullptr) {//memastikan kondisi current tetapi looping selama tidak menuju nullptr
+        if (current->nama == nama) {//memeriksa nama game
+            cout << "Game ditemukan!" << endl;
+            cout << "Nama Game : " << current->nama << endl;
+            cout << "Harga     : Rp." << current->harga << endl;
+            return;
         }
-    }
+        current = current->next;//next node
+    }//pesan yang akan muncul jika game yang ingin dicari tidak tersedia
     cout << "Game dengan nama " << nama << " tidak tersedia!" << endl;
 }
-
-// Fungsi untuk menampilkan seluruh data game dalam hashtable
-void tampilkanSemuaGame() {
+// Fungsi untuk menampilkan seluruh data game dalam linked list
+void TampilkanSemuaGame() {
     cout << "==============================================================" << endl;
     cout << "=                         SEMUA GAME                         =" << endl;
     cout << "==============================================================" << endl;
     cout << setw(25) << left << "Nama Game" << setw(15) << left << "Harga" << endl;
     cout << "==============================================================" << endl;
-    for (int i = 0; i < MAX_SIZE; ++i) {
-        Game* current = table[i];
-        while (current != nullptr) {
-            cout << setw(25) << left << current->nama << "Rp." << current->harga << endl;
-            current = current->next;
-        }
+    Game* current = head;//inisialisasi pointer current menuju head
+    while (current != nullptr) {//memastikan kondisi current tetapi looping selama tidak menuju nullptr
+        cout << setw(25) << left << current->nama << "Rp." << current->harga << endl;
+        current = current->next;// next node
     }
     cout << "==============================================================" << endl;
 }
 
 // Fungsi utama
 int main() {
-    initializeTable();
+    initializeList();
 
     cout << "==============================================================" << endl;
-    cout << "=                      GAME CENTER IN                        =" << endl;
+    cout << "=                       GAME CENTER IN                       =" << endl;
     cout << "==============================================================" << endl;
     while (true) {
         cout << "=============================" << endl;
@@ -218,7 +172,7 @@ int main() {
                 getline(cin, nama);
                 cout << "Inputkan Harga Game: ";
                 cin >> harga;
-                addGame(nama, harga);
+                JualGame(nama, harga);
                 break;
             }
             case 2: {
@@ -229,7 +183,7 @@ int main() {
                 cout << "Inputkan Nama Game yang akan dihapus: ";
                 cin.ignore();
                 getline(cin, nama);
-                removeGame(nama);
+                HapusGame(nama);
                 break;
             }
             case 3: {
@@ -240,9 +194,9 @@ int main() {
                 string orang;
                 int bayar;
                 cout << "Inputkan Nama Game yang akan dibeli: ";
-                cin.ignore(); // Mengabaikan karakter newline yang tersisa
+                cin.ignore();
                 getline(cin, nama);
-                beliGame(nama, orang, bayar);
+                BeliGame(nama, orang, bayar);
                 break;
             }
             case 4: {
@@ -253,18 +207,18 @@ int main() {
                 cout << "Inputkan Nama Game yang akan dicari: ";
                 cin.ignore();
                 getline(cin, nama);
-                cariGame(nama);
+                CariGame(nama);
                 break;
             }
             case 5: {
-                tampilkanSemuaGame();
+                TampilkanSemuaGame();
                 break;
             }
             case 6:
                 cout << "==============================================================" << endl;
                 cout << "=         Terima Kasih Telah Menggunakan Program Ini         =" << endl;
                 cout << "==============================================================" << endl;
-                clearTable();
+                clearList();
                 return 0;
             default:
                 cout << "==============================================================" << endl;
